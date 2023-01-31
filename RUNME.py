@@ -43,14 +43,26 @@ job_json = {
             {
                 "job_cluster_key": "sample_solacc_cluster",
                 "notebook_task": {
-                    "notebook_path": f"01_Introduction_And_Setup"
+                    "notebook_path": f"00_IngestionPCB"
                 },
-                "task_key": "sample_solacc_01"
+                "task_key": "sample_solacc_00"
             },
             {
                 "job_cluster_key": "sample_solacc_cluster",
                 "notebook_task": {
-                    "notebook_path": f"02_Analysis"
+                    "notebook_path": f"01_ImageClassificationPytorch"
+                },
+                "task_key": "sample_solacc_01",
+                "depends_on": [
+                    {
+                        "task_key": "sample_solacc_00"
+                    }
+                ]
+            },
+            {
+                "job_cluster_key": "sample_solacc_cluster",
+                "notebook_task": {
+                    "notebook_path": f"02_PredictionPCB"
                 },
                 "task_key": "sample_solacc_02",
                 "depends_on": [
@@ -64,12 +76,12 @@ job_json = {
             {
                 "job_cluster_key": "sample_solacc_cluster",
                 "new_cluster": {
-                    "spark_version": "11.3.x-cpu-ml-scala2.12",
+                    "spark_version": "12.1.x-gpu-ml-scala2.12",
                 "spark_conf": {
                     "spark.databricks.delta.formatCheck.enabled": "false"
                     },
                     "num_workers": 2,
-                    "node_type_id": {"AWS": "i3.xlarge", "MSA": "Standard_DS3_v2", "GCP": "n1-highmem-4"},
+                    "node_type_id": {"AWS": "g5.xlarge", "MSA": "Standard_NC12", "GCP": "a2-highgpu-1g"},
                     "custom_tags": {
                         "usage": "solacc_testing"
                     },
