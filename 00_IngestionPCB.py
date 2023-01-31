@@ -176,7 +176,8 @@ display(spark.table("circuit_board"))
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE TABLE circuit_board_gold as (select cb.*, labelDetail from circuit_board cb inner join circuit_board_label cbl on cb.filename = cbl.filename)
+# MAGIC DROP TABLE IF EXISTS circuit_board_gold;
+# MAGIC CREATE TABLE circuit_board_gold as (select cb.*, labelDetail from circuit_board cb inner join circuit_board_label cbl on cb.filename = cbl.filename);
 
 # COMMAND ----------
 
@@ -203,10 +204,6 @@ display(spark.table("circuit_board"))
 # MAGIC from
 # MAGIC   circuit_board_gold
 # MAGIC limit 10
-
-# COMMAND ----------
-
-# MAGIC %sql describe detail circuit_board_gold
 
 # COMMAND ----------
 
