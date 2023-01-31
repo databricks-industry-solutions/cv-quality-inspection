@@ -75,7 +75,8 @@ import numpy as np
 from functools import partial
 import io
 
-mlflow.set_experiment("cv_pcb_classification_experiment")
+username = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
+mlflow.set_experiment('/Users/{}/pcbqi'.format(username))
 
 # COMMAND ----------
 
