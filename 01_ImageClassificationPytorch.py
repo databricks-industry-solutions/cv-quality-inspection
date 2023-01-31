@@ -75,6 +75,8 @@ import numpy as np
 from functools import partial
 import io
 
+mlflow.set_experiment("cv_pcb_classification_experiment")
+
 # COMMAND ----------
 
 # MAGIC %md 
