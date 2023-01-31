@@ -22,7 +22,9 @@
 
 # COMMAND ----------
 
-petastorm_path="file:///dbfs/tmp/petastorm/cache"  # location where to store petastorm cache files
+petastorm_path = (
+    "file:///dbfs/tmp/petastorm/cache"  # location where to store petastorm cache files
+)
 model_name = "cv_pcb_classification"
 
 # COMMAND ----------
@@ -75,8 +77,10 @@ import numpy as np
 from functools import partial
 import io
 
-username = dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
-mlflow.set_experiment('/Users/{}/pcbqi'.format(username))
+username = (
+    dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
+)
+mlflow.set_experiment("/Users/{}/pcbqi".format(username))
 
 # COMMAND ----------
 
@@ -133,9 +137,7 @@ except:
 # COMMAND ----------
 
 # configure destination for petastore cache
-spark.conf.set(
-    SparkDatasetConverter.PARENT_CACHE_DIR_URL_CONF, petastorm_path
-)
+spark.conf.set(SparkDatasetConverter.PARENT_CACHE_DIR_URL_CONF, petastorm_path)
 
 # determine rough bytes in dataset
 bytes_in_train = (
@@ -175,6 +177,7 @@ from torchvision.models import (
     ViT_B_16_Weights,
     vit_b_16,
 )
+
 
 def get_model():
     # access pretrained model
@@ -470,9 +473,12 @@ def train_fn(params):
 
 # determine degree of parallelism to employ
 if torch.cuda.is_available():  # is gpu
-    parallelism = int(
-        sc.getConf().get("spark.databricks.clusterUsageTags.clusterWorkers")
-    )
+    nbrWorkers = sc.getConf().get("spark.databricks.clusterUsageTags.clusterWorkers")
+    if nbrWorkers is None:  # gcp
+        nbrWorkers = sc.getConf().get(
+            "spark.databricks.clusterUsageTags.clusterTargetWorkers"
+        )
+    parallelism = int(nbrWorkers)
     if parallelism == 0:  # single node cluster
         parallelism = 1
 else:  # is cpu
