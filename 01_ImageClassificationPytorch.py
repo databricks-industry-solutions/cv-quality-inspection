@@ -606,9 +606,12 @@ def train_and_evaluate_hvd(lr=0.001):
 
 # determine parallelism available to horovod
 if torch.cuda.is_available():  # is gpu
-    parallelism = int(
-        sc.getConf().get("spark.databricks.clusterUsageTags.clusterWorkers")
-    )
+    nbrWorkers = sc.getConf().get("spark.databricks.clusterUsageTags.clusterWorkers")
+    if nbrWorkers is None:  # gcp
+        nbrWorkers = sc.getConf().get(
+            "spark.databricks.clusterUsageTags.clusterTargetWorkers"
+        )
+    parallelism = int(nbrWorkers)
     if parallelism == 0:  # single node cluster
         parallelism = 1
 else:
