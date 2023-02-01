@@ -164,6 +164,10 @@ display(df)
 
 # COMMAND ----------
 
+username = (
+    dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
+)
+mlflow.set_experiment("/Users/{}/pcbqi".format(username))
 model_name = "cv_pcb_classification_rt"
 with mlflow.start_run(run_name=model_name) as run:
     mlflowModel = mlflow.pyfunc.log_model(
