@@ -675,7 +675,3 @@ client.transition_model_version_stage(
 # MAGIC The model is now ready to be used in any data pipeline (DLT, batch or real time with Databricks Model Serving). 
 # MAGIC 
 # MAGIC Let's see how we can use it to [run inferences]($./02_PredictionPCB) at scale.
-
-# COMMAND ----------
-
-

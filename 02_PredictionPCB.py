@@ -6,11 +6,14 @@ from mlflow.store.artifact.models_artifact_repo import ModelsArtifactRepository
 
 model_name = "cv_pcb_classification"
 
+
 local_path = ModelsArtifactRepository(
     f"models:/{model_name}/Production"
 ).download_artifacts(
     ""
 )
+
+
 
 # COMMAND ----------
 
@@ -85,6 +88,109 @@ spark.table("circuit_board_gold").withColumn(
 # MAGIC   circuit_board_prediction
 # MAGIC where
 # MAGIC   labelName != prediction.labelName
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Deploy it to our rest REST real-time inference endpoints
+# MAGIC 
+# MAGIC But first let's create a wrapper model to be able to accept base64 images as input and publish it to MLflow
+
+# COMMAND ----------
+
+import pandas as pd
+import numpy as np
+import torch
+import base64
+from PIL import Image
+import io
+import mlflow
+from io import BytesIO
+
+from torchvision.models import ViT_B_16_Weights
+
+
+
+class CVModelWrapper(mlflow.pyfunc.PythonModel):
+    def __init__(self, model):
+        # instantiate model in evaluation mode
+        model.to(torch.device("cpu"))
+        self.model = model.eval()
+        weights = ViT_B_16_Weights.DEFAULT
+        self.feature_extractor = weights.transforms()
+
+    def predict(self, context, images):
+        with torch.set_grad_enabled(False):
+          id2label = {0: "normal", 1: "anomaly"}
+          pil_images = torch.stack(
+              [
+                  self.feature_extractor(
+                      Image.open(BytesIO(base64.b64decode(row[0]))).convert("RGB")
+                  )
+                  for _, row in images.iterrows()
+              ]
+          )
+          pil_images = pil_images.to(torch.device("cpu"))
+          outputs = self.model(pil_images)
+          preds = torch.max(outputs, 1)[1]
+          probs = torch.nn.functional.softmax(outputs, dim=-1)[:, 1]
+          labels = [id2label[pred] for pred in preds.tolist()]
+
+          return pd.DataFrame( data=dict(
+            score=probs,
+            label=preds,
+            labelName=labels)
+          )
+
+# COMMAND ----------
+
+loaded_model = torch.load(
+    local_path + "data/model.pth", map_location=torch.device("cpu")
+)
+wrapper = CVModelWrapper(loaded_model)
+images = spark.table("circuit_board_gold").take(25)
+
+b64image1 = base64.b64encode(images[0]["content"]).decode("ascii")
+b64image2 = base64.b64encode(images[1]["content"]).decode("ascii")
+b64image3 = base64.b64encode(images[3]["content"]).decode("ascii")
+b64image4 = base64.b64encode(images[4]["content"]).decode("ascii")
+b64image24 = base64.b64encode(images[24]["content"]).decode("ascii")
+
+df_input = pd.DataFrame(
+    [b64image1, b64image2, b64image3, b64image4, b64image24], columns=["data"]
+)
+df = wrapper.predict("", df_input)
+display(df)
+
+# COMMAND ----------
+
+model_name = "cv_pcb_classification_rt"
+with mlflow.start_run(run_name=model_name) as run:
+    mlflowModel = mlflow.pyfunc.log_model(
+        artifact_path="model",
+        python_model=wrapper,
+        input_example=df_input,
+        registered_model_name=model_name,
+    )
+
+# COMMAND ----------
+
+from mlflow import MlflowClient
+
+client = MlflowClient()
+latest_version = client.get_latest_versions(name=model_name, stages=["None"])[0].version
+client.transition_model_version_stage(
+    name=model_name, version=latest_version, stage="Staging"
+)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC We can now deploy this new model to our serverless real-time serving.
+# MAGIC 
+# MAGIC Use the example and click "send request"
+# MAGIC 
+# MAGIC <img width="1000px" src="https://raw.githubusercontent.com/databricks-industry-solutions/cv-quality-inspection/main/images/serving.png">
 
 # COMMAND ----------
 
