@@ -2,17 +2,17 @@
 # MAGIC %md
 # MAGIC # Implementing and deploying our pytorch model
 # MAGIC 
-# MAGIC Our next step as Data Scientist is to implement a ML model to run image classification.
+# MAGIC Our next step as a Data Scientist is to implement an ML model to run image classification.
 # MAGIC 
-# MAGIC We'll re-use the gold table built in our previous data pipeline as training dataset.
+# MAGIC We will re-use the gold table built in our previous data pipeline as a training dataset.
 # MAGIC 
 # MAGIC Building such a model is greatly simplified by the use of [torchvision](https://pytorch.org/vision/stable/index.html).
 # MAGIC 
 # MAGIC ## MLOps steps
 # MAGIC 
-# MAGIC While building an image classification model can be easily done, deploying such model in production is much harder.
+# MAGIC While building an image classification model can be easily done, deploying models in production is much harder.
 # MAGIC 
-# MAGIC Databricks simplify this process and accelerate DS journey with the help of MLFlow by providing
+# MAGIC Databricks simplifies this process and accelerate the time-to-value journey with the help of MLFlow by providing
 # MAGIC 
 # MAGIC * Auto experimentation tracking to keep track of progress
 # MAGIC * Simple, distributed hyperparameter tuning with hyperopt to get the best model
@@ -30,7 +30,8 @@ model_name = "cv_pcb_classification"
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC With DeepLearning it's better to use a GPU
+# MAGIC ## Enable the GPU
+# MAGIC With Deep Learning it makes sense to use GPUs for training.
 
 # COMMAND ----------
 
@@ -123,9 +124,9 @@ display(
 
 # MAGIC %md 
 # MAGIC ## Delta table for DL with petastorm
-# MAGIC Our data is currently stored as Delta table and available as spark dataframe. However, pytorch is expecting a specific type of data.
+# MAGIC Our data is currently stored as a Delta table and available as a Spark dataframe. However, pytorch is expecting a specific type of data.
 # MAGIC 
-# MAGIC To solve that, we'll be using petastorm and spark converter to automatically send data to our model from the table. The converter will incrementally load the data using local cache for faster process. Please read the [Documentation](https://docs.databricks.com/applications/machine-learning/load-data/petastorm.html) for more details.
+# MAGIC To solve that, we will use Petastorm and the Spark converter to automatically send data to our model from the table. The converter will incrementally load the data using local cache for faster processing. Please see the associated [documentation](https://docs.databricks.com/applications/machine-learning/load-data/petastorm.html) for more details.
 
 # COMMAND ----------
 
@@ -169,7 +170,8 @@ NUM_CLASSES = 2  # two classes in labels (0 or 1)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Torchvision provides for us pre-trained models 
+# MAGIC ## Torchvision
+# MAGIC Torchvision provides us with pre-trained models that we can reuse
 
 # COMMAND ----------
 
@@ -443,9 +445,9 @@ def train_and_evaluate(lr=0.001):
 # MAGIC %md
 # MAGIC ## Hyperparameters tuning with Hyperopt
 # MAGIC 
-# MAGIC Our model is now ready. Tuning such a model can be tricky. We have the choice between lot of architecture, encoder and extra hyperparameter like the learning rate.
+# MAGIC Our model is now ready. Tuning such a model can be complex. We have the choices between architectures, encoders, and hyperparameters like the learning rate.
 # MAGIC 
-# MAGIC Let's use Hyperopt to find the best set of hyperparameters for us. Note that Hyperopt can also work in a distributed fashion, training multiple models in parallel on multiple instances to speedup our training.
+# MAGIC Let us use Hyperopt to find the best set of hyperparameters for us. Note that Hyperopt can also work in a distributed manner, training multiple models in parallel on multiple instances to speed-up the training process.
 
 # COMMAND ----------
 
@@ -503,7 +505,7 @@ argmin = {"lr": 1.1747777342914114e-5}
 
 # MAGIC %md
 # MAGIC ### Distributed deep learning with Horovod
-# MAGIC We can now build our model with more EPOCS. To accelerate the run we can distribute the training accros multiliple nodes.
+# MAGIC We can now train our model with more epochs. To accelerate the run we can distribute the training accros multiple nodes on our Spark cluster.
 # MAGIC 
 # MAGIC See the documentation of [Horovod](https://docs.databricks.com/machine-learning/train-model/distributed-training/horovod-runner.html) for more details.
 
@@ -668,10 +670,14 @@ client.transition_model_version_stage(
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Our model is now deployed and flag as production-ready!
+# MAGIC ## Our model is now deployed and flagged as production-ready!
 # MAGIC 
-# MAGIC We have now deploy our model to our Registry. This will give model governance, simplifying and accelerating all downstream pipeline developements.
+# MAGIC We have now deployed our model to our model registry. This will provide model governance, and will simplify and accelerate all downstream pipeline developements.
 # MAGIC 
 # MAGIC The model is now ready to be used in any data pipeline (DLT, batch or real time with Databricks Model Serving). 
 # MAGIC 
-# MAGIC Let's see how we can use it to [run inferences]($./02_PredictionPCB) at scale.
+# MAGIC Let us now see how we can use it to [run inferences]($./02_PredictionPCB) at scale.
+
+# COMMAND ----------
+
+
