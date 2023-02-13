@@ -37,44 +37,45 @@ job_json = {
         "max_concurrent_runs": 1,
         "tags": {
             "usage": "solacc_testing",
-            "group": "SOLACC"
+            "group": "MFG",
+            "accelerator": "cv-quality-inspection"
         },
         "tasks": [
             {
-                "job_cluster_key": "sample_solacc_cluster",
+                "job_cluster_key": "cv_qi_cluster",
                 "notebook_task": {
                     "notebook_path": f"00_IngestionPCB"
                 },
-                "task_key": "sample_solacc_00"
+                "task_key": "cv_qi_00"
             },
             {
-                "job_cluster_key": "sample_solacc_cluster",
+                "job_cluster_key": "cv_qi_cluster",
                 "notebook_task": {
                     "notebook_path": f"01_ImageClassificationPytorch"
                 },
-                "task_key": "sample_solacc_01",
+                "task_key": "cv_qi_01",
                 "depends_on": [
                     {
-                        "task_key": "sample_solacc_00"
+                        "task_key": "cv_qi_00"
                     }
                 ]
             },
             {
-                "job_cluster_key": "sample_solacc_cluster",
+                "job_cluster_key": "cv_qi_cluster",
                 "notebook_task": {
                     "notebook_path": f"02_PredictionPCB"
                 },
-                "task_key": "sample_solacc_02",
+                "task_key": "cv_qi_02",
                 "depends_on": [
                     {
-                        "task_key": "sample_solacc_01"
+                        "task_key": "cv_qi_01"
                     }
                 ]
             }
         ],
         "job_clusters": [
             {
-                "job_cluster_key": "sample_solacc_cluster",
+                "job_cluster_key": "cv_qi_cluster",
                 "new_cluster": {
                     "spark_version": "12.1.x-gpu-ml-scala2.12",
                 "spark_conf": {
@@ -83,7 +84,8 @@ job_json = {
                     "num_workers": 2,
                     "node_type_id": {"AWS": "g5.xlarge", "MSA": "Standard_NC12", "GCP": "a2-highgpu-1g"},
                     "custom_tags": {
-                        "usage": "solacc_testing"
+                        "usage": "solacc_testing",
+                        "accelerator": "cv-quality-inspection"
                     },
                 }
             }
@@ -95,3 +97,7 @@ job_json = {
 dbutils.widgets.dropdown("run_job", "False", ["True", "False"])
 run_job = dbutils.widgets.get("run_job") == "True"
 NotebookSolutionCompanion().deploy_compute(job_json, run_job=run_job)
+
+# COMMAND ----------
+
+
