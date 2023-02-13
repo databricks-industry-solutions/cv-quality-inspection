@@ -1,43 +1,41 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Computer vision - quality inspection of Printed Circuit Board (PCB)
+# MAGIC # Product Quality Inspection of Printed Circuit Board (PCB) using Computer Vision and Real-time Serverless Inference
 # MAGIC 
 # MAGIC <div style="float:right">
 # MAGIC <img width="500px" src="https://raw.githubusercontent.com/databricks-industry-solutions/cv-quality-inspection/main/images/PCB1.png">
 # MAGIC </div>
 # MAGIC 
-# MAGIC In this demo, we'll show you how Databricks can help you deploying an end to end image quality inspection.
+# MAGIC In this solution accelerator, we will show you how Databricks can help you to deploy an end-to-end pipeline for product quality inspection. The model is deployed using Databricks [Serverless Real-time Inference](https://docs.databricks.com/archive/serverless-inference-preview/serverless-real-time-inference.html).
 # MAGIC 
-# MAGIC We'll be using the [Visual Anomaly (VisA)](https://registry.opendata.aws/visa/) detection dataset, and build an end to end pipeline to detect anomaly in our PCB images. 
+# MAGIC We will use the [Visual Anomaly (VisA)](https://registry.opendata.aws/visa/) detection dataset, and build a pipeline to detect anomalies in our PCB images. 
 # MAGIC 
 # MAGIC ## Why image quality inspection?
 # MAGIC 
-# MAGIC Image quality inspection is a common challenge in the context of manufacturing. It's key to build a Smart Manufacturing Systems.
+# MAGIC Image quality inspection is a common challenge in the context of manufacturing. It is key to delivering Smart Manufacturing.
 # MAGIC 
 # MAGIC ## Implementing a production-grade pipeline
 # MAGIC 
-# MAGIC At a pure ML level, the image classification problem has been facilitated in the recent years with pre-trained models (transfer learning) and higher level ML frameworks.
-# MAGIC 
-# MAGIC While a talented DS team can quickly deploy such model, a real challenge remains in the implementation of a production grade, end to end pipeline, consuming images and covering all the MLOps/governances, and ultimately exposing result to business lines (BI/Dashboarding).
-# MAGIC 
-# MAGIC This is the critical part of all ML project and one of the most difficult.
+# MAGIC The image classification problem has been eased in recent years with pre-trained deep learning models, transfer learning, and higher-level frameworks. While a data science team can quickly deploy such a model, a real challenge remains in the implementation of a production-grade, end-to-end pipeline, consuming images and requiring MLOps/governance, and ultimately delivering results.
 # MAGIC 
 # MAGIC Databricks Lakehouse is designed to make this overall process simple, letting Data Scientist focus on the core use-case.
-# MAGIC The first step is the ingestion.
 # MAGIC 
-# MAGIC Databricks allows to load any source of data, even images and create a table with the content of the image and also the label in a efficient and a distributed way.
+# MAGIC In order to build the quality inspection model, we use Torchvision. However, the same architecture may be used with other libraries. The Torchvision library is part of the PyTorch project, a popular framework for deep learning. Torchvision comes with model architectures, popular datasets, and image transformations. 
+# MAGIC 
+# MAGIC 
+# MAGIC The first step in building the pipeline is data ingestion. Databricks enables the loading of any source of data, even images (unstructured data). This is stored in a table with the content of the image and also the associated label in a efficient and a distributed way.
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ## Quality inspection image pipeline
 # MAGIC 
-# MAGIC This is the pipeline we'll be building. We're ingesting 2 dataset:
+# MAGIC This is the pipeline we will be building. We ingest 2 datasets, namely:
 # MAGIC 
 # MAGIC * The raw satellite images (jpg) containing PCB
 # MAGIC * The label, the type of anomalies saved as CSV files
 # MAGIC 
-# MAGIC We'll first focus on building a data pipeline to incrementally load this data and create a final Gold table.
+# MAGIC We will first focus on building a data pipeline to incrementally load this data and create a final Gold table.
 # MAGIC 
 # MAGIC This table will then be used to train a ML Classification model to learn to detect anomalies in our images in real time!
 # MAGIC 
@@ -48,9 +46,9 @@
 # MAGIC %md
 # MAGIC ### Download the dataset from https://registry.opendata.aws/visa/
 # MAGIC 
-# MAGIC We can just use any bash commands.
+# MAGIC We will use `bash` commands to download the dataset from [https://registry.opendata.aws/visa/](https://registry.opendata.aws/visa/)
 # MAGIC 
-# MAGIC As the data are on AWS S3, we need to install the AWS CLI library.
+# MAGIC As the data are on AWS S3, we need to install the AWS CLI library (`awscli`).
 
 # COMMAND ----------
 
@@ -71,11 +69,11 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Let's see some PCB images
+# MAGIC ## Let us view some PCB images
 # MAGIC 
-# MAGIC We can display images with matplotlib in a native python way.
+# MAGIC We can display images with `matplotlib` in a native python way.
 # MAGIC 
-# MAGIC Let's see a normal and an anomaly pcb cards.
+# MAGIC Let us investigate what a normal image looks like, and then one with an anomaly.
 
 # COMMAND ----------
 
@@ -95,7 +93,7 @@ display_image("/tmp/data/pcb1/Data/Images/Anomaly/000.JPG")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Let's move the data to DBFS. 
+# MAGIC ## Let us now move the data to DBFS. 
 # MAGIC 
 # MAGIC Quick reminder: the Databricks File System (DBFS) is a distributed file system mounted into a Databricks workspace and available on Databricks clusters. DBFS is an abstraction on top of scalable object storage that maps Unix-like filesystem calls to native cloud storage API calls. 
 
@@ -113,7 +111,8 @@ cloud_storage_path="/pcb1"
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Load CSV label files with autoloader
+# MAGIC ### Load CSV label files with Auto Loader
+# MAGIC CSV files can easily be loaded using Databricks [Auto Loader](https://docs.databricks.com/ingestion/auto-loader/index.html)
 
 # COMMAND ----------
 
@@ -138,10 +137,10 @@ display(spark.table("circuit_board_label"))
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Load binary files with autoloader
+# MAGIC ### Load binary files with Auto Loader
 # MAGIC 
-# MAGIC We can now use the autoloader to load images and spark function to create the label column.
-# MAGIC We can also very easily display the content of the images and the label like any table.
+# MAGIC We can now use the Auto Loader to load images, and spark function to create the label column.
+# MAGIC We can also very easily display the content of the images and the labels as a table.
 
 # COMMAND ----------
 
@@ -171,7 +170,7 @@ display(spark.table("circuit_board"))
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Let's merge the labels and the images tables
+# MAGIC ## Let us now merge the labels and the images tables
 
 # COMMAND ----------
 
@@ -183,6 +182,7 @@ display(spark.table("circuit_board"))
 
 # MAGIC %md
 # MAGIC ## We can auto optimize our image tables
+# MAGIC Auto optimize consists of two complementary features: optimized writes and auto compaction.
 
 # COMMAND ----------
 
@@ -209,10 +209,14 @@ display(spark.table("circuit_board"))
 
 # MAGIC %md
 # MAGIC 
-# MAGIC ### Our dataset is ready for our Data Scientist team
+# MAGIC ### Our dataset is ready for our Data Science team
 # MAGIC 
-# MAGIC That's it! We have now deployed a production-ready pipeline.
+# MAGIC That's it! We have now deployed a production-ready ingestion pipeline.
 # MAGIC 
-# MAGIC Our images are incrementally ingested, joined with our label dataset.
+# MAGIC Our images are incrementally ingested and joined with our label dataset.
 # MAGIC 
 # MAGIC Let's see how this data can be used by a Data Scientist to [build the model]($./01_ImageClassificationPytorch) required for boat detection.
+
+# COMMAND ----------
+
+
