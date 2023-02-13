@@ -1,5 +1,12 @@
 # Databricks notebook source
-# DBTITLE 1,Download the model from the MLflowRepository
+# MAGIC %md
+# MAGIC #Using the model for inference in production
+# MAGIC In the previous notebook we have trained our deep learning model and deployed it using the model registry. Here we will see how we can use the model for inference.
+# MAGIC 
+# MAGIC In the first step we will need to download the model from MLflow repository
+
+# COMMAND ----------
+
 import os
 import torch
 from mlflow.store.artifact.models_artifact_repo import ModelsArtifactRepository
@@ -17,7 +24,12 @@ local_path = ModelsArtifactRepository(
 
 # COMMAND ----------
 
-# DBTITLE 1,Create the UDF fonction to classify PCB images
+# MAGIC %md
+# MAGIC ## Classifying PCB images
+# MAGIC We will now create the UDF function that will be used to classify the PCB images
+
+# COMMAND ----------
+
 from pyspark.sql.functions import pandas_udf
 import pandas as pd
 from typing import Iterator
@@ -67,12 +79,22 @@ def apply_vit(images_iter: Iterator[pd.Series]) -> Iterator[pd.DataFrame]:
 
 # COMMAND ----------
 
-# DBTITLE 1,Set the batch size to 64
+# MAGIC %md
+# MAGIC ## Set batch size
+# MAGIC Let us set the batch size to 64 using the `maxRecordsPerBatch` parameter, for when data partitions in Spark are converted to Arrow record batches
+
+# COMMAND ----------
+
 spark.conf.set("spark.sql.execution.arrow.maxRecordsPerBatch", 64)
 
 # COMMAND ----------
 
-# DBTITLE 1,Compute a new table with the prediction for every images
+# MAGIC %md
+# MAGIC ## Prediction table
+# MAGIC We can now compute a new table with the predictions done for every image
+
+# COMMAND ----------
+
 spark.sql("drop table IF EXISTS circuit_board_prediction")
 spark.table("circuit_board_gold").withColumn(
     "prediction", apply_vit("content")
@@ -80,7 +102,12 @@ spark.table("circuit_board_gold").withColumn(
 
 # COMMAND ----------
 
-# DBTITLE 1,Display images with a wrong label
+# MAGIC %md
+# MAGIC ## Display images that are wrongly labelled
+# MAGIC Display images with a wrong label using simple SQL
+
+# COMMAND ----------
+
 # MAGIC %sql
 # MAGIC select
 # MAGIC   *
@@ -92,9 +119,11 @@ spark.table("circuit_board_gold").withColumn(
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ### Deploy it to our rest REST real-time inference endpoints
+# MAGIC ### Deploy it to our rest REST serverless real-time inference endpoints
 # MAGIC 
-# MAGIC But first let's create a wrapper model to be able to accept base64 images as input and publish it to MLflow
+# MAGIC Let us deploy the model to a REST serverless real-time inference endpoint.
+# MAGIC 
+# MAGIC But first let us create a wrapper model to be able to accept base64 images as input and publish it to MLflow
 
 # COMMAND ----------
 
@@ -190,9 +219,9 @@ client.transition_model_version_stage(
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC We can now deploy this new model to our serverless real-time serving.
+# MAGIC We can now deploy this new model to our serverless real-time serving endpoint.
 # MAGIC 
-# MAGIC Use the example and click "send request"
+# MAGIC Use the example and click "send request".
 # MAGIC 
 # MAGIC <img width="1000px" src="https://raw.githubusercontent.com/databricks-industry-solutions/cv-quality-inspection/main/images/serving.png">
 
@@ -202,10 +231,9 @@ client.transition_model_version_stage(
 # MAGIC 
 # MAGIC # Conclusion
 # MAGIC 
-# MAGIC That's it, we have build an end 2 end pipeline to incrementally ingest our dataset, clean it and train a Deep Learning model. The model is now deployed and ready for production-grade usage.
+# MAGIC That is it! We have built an end-toend pipeline to incrementally ingest our dataset, clean it, and train a deep learning model. The production-grade pipeline and model is now deployed and ready for use.
 # MAGIC 
 # MAGIC Databricks Lakehouse accelerate your team and simplify the go-to production:
-# MAGIC 
 # MAGIC 
 # MAGIC * Unique ingestion and data preparation capabilities with autoloader making Data Engineering accessible to all
 # MAGIC * Ability to support all use-cases ingest and process structured and non structured dataset
@@ -215,4 +243,8 @@ client.transition_model_version_stage(
 # MAGIC * Security and compliance covered all along, from data security (table ACL) to model governance
 # MAGIC 
 # MAGIC 
-# MAGIC As result, Teams using Databricks are able to deploy in production advanced ML projects in a matter of weeks, from ingestion to model deployment, drastically accelerating business.
+# MAGIC As a result, teams using Databricks are able to deploy in production advanced ML projects in a matter of weeks, from ingestion to model deployment, drastically accelerating business.
+
+# COMMAND ----------
+
+
