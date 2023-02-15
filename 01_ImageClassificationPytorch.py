@@ -22,9 +22,6 @@
 
 # COMMAND ----------
 
-petastorm_path = (
-    "file:///dbfs/tmp/petastorm/cache"  # location where to store petastorm cache files
-)
 model_name = "cv_pcb_classification"
 
 # COMMAND ----------
@@ -82,6 +79,10 @@ username = (
     dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
 )
 mlflow.set_experiment("/Users/{}/pcbqi".format(username))
+
+petastorm_path = (
+    f"file:///dbfs/tmp/petastorm/{username}/cache"  # location where to store petastorm cache files
+)
 
 # COMMAND ----------
 
@@ -677,7 +678,3 @@ client.transition_model_version_stage(
 # MAGIC The model is now ready to be used in any data pipeline (DLT, batch or real time with Databricks Model Serving). 
 # MAGIC 
 # MAGIC Let us now see how we can use it to [run inferences]($./02_PredictionPCB) at scale.
-
-# COMMAND ----------
-
-

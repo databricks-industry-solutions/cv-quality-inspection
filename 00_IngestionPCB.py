@@ -216,7 +216,3 @@ display(spark.table("circuit_board"))
 # MAGIC Our images are incrementally ingested and joined with our label dataset.
 # MAGIC 
 # MAGIC Let's see how this data can be used by a Data Scientist to [build the model]($./01_ImageClassificationPytorch) required for boat detection.
-
-# COMMAND ----------
-
-
