@@ -244,7 +244,3 @@ client.transition_model_version_stage(
 # MAGIC 
 # MAGIC 
 # MAGIC As a result, teams using Databricks are able to deploy in production advanced ML projects in a matter of weeks, from ingestion to model deployment, drastically accelerating business.
-
-# COMMAND ----------
-
-

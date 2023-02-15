@@ -74,6 +74,7 @@ import pyspark.sql.functions as f
 import numpy as np
 from functools import partial
 import io
+import uuid
 
 username = (
     dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
@@ -81,7 +82,7 @@ username = (
 mlflow.set_experiment("/Users/{}/pcbqi".format(username))
 
 petastorm_path = (
-    f"file:///dbfs/tmp/petastorm/{username}/cache"  # location where to store petastorm cache files
+    f"file:///dbfs/tmp/petastorm/{str(uuid.uuid4())}/cache"  # location where to store petastorm cache files
 )
 
 # COMMAND ----------
@@ -667,6 +668,13 @@ client.transition_model_version_stage(
     stage="Production",
     archive_existing_versions=True,
 )
+
+# COMMAND ----------
+
+try:
+    dbutils.fs.rm(petastorm_path, True)
+except:
+    pass
 
 # COMMAND ----------
 
