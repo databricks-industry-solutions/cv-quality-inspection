@@ -40,7 +40,6 @@ ___
 
 ___
 
-<img width="500px" src="https://raw.githubusercontent.com/databricks-industry-solutions/cv-quality-inspection/main/images/PCB1.png">
 
 <img width="1000px" src="https://raw.githubusercontent.com/databricks-industry-solutions/cv-quality-inspection/main/images/pipeline.png">
 
