@@ -1,17 +1,48 @@
 ![image](https://user-images.githubusercontent.com/86326159/206014015-a70e3581-e15c-4a10-95ef-36fd5a560717.png)
 
-[![CLOUD](https://img.shields.io/badge/CLOUD-ALL-blue?logo=googlecloud&style=for-the-badge)](https://cloud.google.com/databricks)
-[![POC](https://img.shields.io/badge/POC-10_days-green?style=for-the-badge)](https://databricks.com/try-databricks)
+# Product Quality Inspection of Printed Circuit Board (PCB) using Computer Vision and Real-time Serverless Inference
 
-*Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.*
+
+In this solution accelerator, we will show you how Databricks can help you to deploy an end-to-end pipeline for product quality inspection. The model is deployed using Databricks [Serverless Real-time Inference](https://docs.databricks.com/archive/serverless-inference-preview/serverless-real-time-inference.html).
+
+We will use the [Visual Anomaly (VisA)](https://registry.opendata.aws/visa/) detection dataset, and build a pipeline to detect anomalies in our PCB images. 
+
+## Why image quality inspection?
+
+Image quality inspection is a common challenge in the context of manufacturing. It is key to delivering Smart Manufacturing.
+
+## Implementing a production-grade pipeline
+
+The image classification problem has been eased in recent years with pre-trained deep learning models, transfer learning, and higher-level frameworks. While a data science team can quickly deploy such a model, a real challenge remains in the implementation of a production-grade, end-to-end pipeline, consuming images and requiring MLOps/governance, and ultimately delivering results.
+
+Databricks Lakehouse is designed to make this overall process simple, letting Data Scientist focus on the core use-case.
+
+In order to build the quality inspection model, we use Torchvision. However, the same architecture may be used with other libraries. The Torchvision library is part of the PyTorch project, a popular framework for deep learning. Torchvision comes with model architectures, popular datasets, and image transformations. 
+
+
+The first step in building the pipeline is data ingestion. Databricks enables the loading of any source of data, even images (unstructured data). This is stored in a table with the content of the image and also the associated label in a efficient and a distributed way.
+
+This is the pipeline we will be building. We ingest 2 datasets, namely:
+
+* The raw satellite images (jpg) containing PCB
+* The label, the type of anomalies saved as CSV files
+
+We will first focus on building a data pipeline to incrementally load this data and create a final Gold table.
+
+This table will then be used to train a ML Classification model to learn to detect anomalies in our images in real time!
+
 
 ___
-<john.doe@databricks.com>
+
+
+<florent.brosse@databricks.com>
+
 
 ___
 
+<img width="500px" src="https://raw.githubusercontent.com/databricks-industry-solutions/cv-quality-inspection/main/images/PCB1.png">
 
-IMAGE TO REFERENCE ARCHITECTURE
+<img width="1000px" src="https://raw.githubusercontent.com/databricks-industry-solutions/cv-quality-inspection/main/images/pipeline.png">
 
 ___
 
@@ -19,7 +50,7 @@ ___
 
 | library                                | description             | license    | source                                              |
 |----------------------------------------|-------------------------|------------|-----------------------------------------------------|
-| PyYAML                                 | Reading Yaml files      | MIT        | https://github.com/yaml/pyyaml                      |
+| aws-cli                                 | Universal Command Line Interface for Amazon Web Services      | Apache 2.0        | https://github.com/aws/aws-cli/                      |
 
 ## Getting started
 
