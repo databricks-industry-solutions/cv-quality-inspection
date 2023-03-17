@@ -1,4 +1,4 @@
-![image](https://user-images.githubusercontent.com/86326159/206014015-a70e3581-e15c-4a10-95ef-36fd5a560717.png)
+![image](https://raw.githubusercontent.com/databricks-industry-solutions/.github/main/profile/solacc_logo_wide.png)
 
 # Product Quality Inspection of Printed Circuit Board (PCB) using Computer Vision and Real-time Serverless Inference
 
