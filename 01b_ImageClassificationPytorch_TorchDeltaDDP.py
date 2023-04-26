@@ -162,8 +162,7 @@ converter_train = make_spark_converter(
     parquet_row_group_size_bytes=int(bytes_in_train / sc.defaultParallelism),
 )
 converter_test = make_spark_converter(
-    images_test, 
-    parquet_row_group_size_bytes=int(bytes_in_test / sc.defaultParallelism)
+    images_test, parquet_row_group_size_bytes=int(bytes_in_test / sc.defaultParallelism)
 )
 
 # COMMAND ----------
@@ -253,7 +252,7 @@ with converter_train.make_torch_dataloader(
 # COMMAND ----------
 
 BATCH_SIZE = 32  # process 32 images at a time
-NUM_EPOCHS = 5  # iterate over all images 5 times
+NUM_EPOCHS = 15  # iterate over all images 5 times
 
 # COMMAND ----------
 
@@ -441,11 +440,7 @@ def train_and_evaluate(lr=0.001):
     return model, val_loss, val_acc, val_f1  # extract value from tensor
 
 
-
-
-# COMMAND ----------
-
-model, loss, acc, f1 = train_and_evaluate(**{'lr':0.00001})
+# model, loss, acc, f1 = train_and_evaluate(**{'lr':0.00001})
 
 # COMMAND ----------
 

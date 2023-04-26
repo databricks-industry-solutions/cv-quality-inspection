@@ -11,7 +11,7 @@ import os
 import torch
 from mlflow.store.artifact.models_artifact_repo import ModelsArtifactRepository
 
-model_name = "cv_pcb_classification"
+model_name = "cv_pcb_classification_ap"
 
 
 local_path = ModelsArtifactRepository(
@@ -193,6 +193,10 @@ display(df)
 
 # COMMAND ----------
 
+df_input.head()
+
+# COMMAND ----------
+
 username = (
     dbutils.notebook.entry_point.getDbutils().notebook().getContext().userName().get()
 )
@@ -224,6 +228,36 @@ client.transition_model_version_stage(
 # MAGIC Use the example and click "send request".
 # MAGIC 
 # MAGIC <img width="1000px" src="https://raw.githubusercontent.com/databricks-industry-solutions/cv-quality-inspection/main/images/serving.png">
+
+# COMMAND ----------
+
+# MAGIC %md 
+# MAGIC ### Serving with API 
+
+# COMMAND ----------
+
+
+
+# COMMAND ----------
+
+import os
+import requests
+import numpy as np
+import pandas as pd
+import json
+
+def create_tf_serving_json(data):
+  return {'inputs': {name: data[name].tolist() for name in data.keys()} if isinstance(data, dict) else data.tolist()}
+
+def score_model(dataset):
+  url = 'https://e2-demo-field-eng.cloud.databricks.com/serving-endpoints/cv_pcb/invocations'
+  headers = {'Authorization': f'Bearer {os.environ.get("DATABRICKS_TOKEN")}', 'Content-Type': 'application/json'}
+  ds_dict = {'dataframe_split': dataset.to_dict(orient='split')} if isinstance(dataset, pd.DataFrame) else create_tf_serving_json(dataset)
+  data_json = json.dumps(ds_dict, allow_nan=True)
+  response = requests.request(method='POST', headers=headers, url=url, data=data_json)
+  if response.status_code != 200:
+    raise Exception(f'Request failed with status {response.status_code}, {response.text}')
+  return response.json()
 
 # COMMAND ----------
 
