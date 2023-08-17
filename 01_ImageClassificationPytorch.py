@@ -1,19 +1,23 @@
 # Databricks notebook source
+# MAGIC %md This notebook is available at https://github.com/databricks-industry-solutions/cv-quality-inspection. For more information about this solution accelerator, visit https://www.databricks.com/solutions/accelerators/product-quality-inspection.
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # Implementing and deploying our pytorch model
-# MAGIC 
+# MAGIC
 # MAGIC Our next step as a Data Scientist is to implement an ML model to run image classification.
-# MAGIC 
+# MAGIC
 # MAGIC We will re-use the gold table built in our previous data pipeline as a training dataset.
-# MAGIC 
+# MAGIC
 # MAGIC Building such a model is greatly simplified by the use of [torchvision](https://pytorch.org/vision/stable/index.html).
-# MAGIC 
+# MAGIC
 # MAGIC ## MLOps steps
-# MAGIC 
+# MAGIC
 # MAGIC While building an image classification model can be easily done, deploying models in production is much harder.
-# MAGIC 
+# MAGIC
 # MAGIC Databricks simplifies this process and accelerate the time-to-value journey with the help of MLFlow by providing
-# MAGIC 
+# MAGIC
 # MAGIC * Auto experimentation tracking to keep track of progress
 # MAGIC * Simple, distributed hyperparameter tuning with hyperopt to get the best model
 # MAGIC * Model packaging in MLFlow, abstracting our ML framework
@@ -89,7 +93,7 @@ petastorm_path = (
 
 # MAGIC %md 
 # MAGIC ## Split data as train/test dataset
-# MAGIC 
+# MAGIC
 # MAGIC Like for any ML model, we start by splitting the images in a training/test dataset
 
 # COMMAND ----------
@@ -124,10 +128,18 @@ display(
 
 # COMMAND ----------
 
+images_test.display()
+
+# COMMAND ----------
+
+images_train.display()
+
+# COMMAND ----------
+
 # MAGIC %md 
 # MAGIC ## Delta table for DL with petastorm
 # MAGIC Our data is currently stored as a Delta table and available as a Spark dataframe. However, pytorch is expecting a specific type of data.
-# MAGIC 
+# MAGIC
 # MAGIC To solve that, we will use Petastorm and the Spark converter to automatically send data to our model from the table. The converter will incrementally load the data using local cache for faster processing. Please see the associated [documentation](https://docs.databricks.com/applications/machine-learning/load-data/petastorm.html) for more details.
 
 # COMMAND ----------
@@ -446,9 +458,9 @@ def train_and_evaluate(lr=0.001):
 
 # MAGIC %md
 # MAGIC ## Hyperparameters tuning with Hyperopt
-# MAGIC 
+# MAGIC
 # MAGIC Our model is now ready. Tuning such a model can be complex. We have the choices between architectures, encoders, and hyperparameters like the learning rate.
-# MAGIC 
+# MAGIC
 # MAGIC Let us use Hyperopt to find the best set of hyperparameters for us. Note that Hyperopt can also work in a distributed manner, training multiple models in parallel on multiple instances to speed-up the training process.
 
 # COMMAND ----------
@@ -508,7 +520,7 @@ argmin = {"lr": 1.1747777342914114e-5}
 # MAGIC %md
 # MAGIC ### Distributed deep learning with Horovod
 # MAGIC We can now train our model with more epochs. To accelerate the run we can distribute the training accros multiple nodes on our Spark cluster.
-# MAGIC 
+# MAGIC
 # MAGIC See the documentation of [Horovod](https://docs.databricks.com/machine-learning/train-model/distributed-training/horovod-runner.html) for more details.
 
 # COMMAND ----------
@@ -641,9 +653,9 @@ with mlflow.start_run(run_name=model_name) as run:
 
 # MAGIC %md 
 # MAGIC ## Deploying our model in production
-# MAGIC 
+# MAGIC
 # MAGIC Our model is now trained. All we have to do is get the best model (based on the `f1` metric) and deploy it in MLFlow registry.
-# MAGIC 
+# MAGIC
 # MAGIC We can do that using the UI or with a couple of API calls:
 
 # COMMAND ----------
@@ -680,9 +692,9 @@ except:
 
 # MAGIC %md
 # MAGIC ## Our model is now deployed and flagged as production-ready!
-# MAGIC 
+# MAGIC
 # MAGIC We have now deployed our model to our model registry. This will provide model governance, and will simplify and accelerate all downstream pipeline developements.
-# MAGIC 
+# MAGIC
 # MAGIC The model is now ready to be used in any data pipeline (DLT, batch or real time with Databricks Model Serving). 
-# MAGIC 
+# MAGIC
 # MAGIC Let us now see how we can use it to [run inferences]($./02_PredictionPCB) at scale.

@@ -1,8 +1,12 @@
 # Databricks notebook source
+# MAGIC %md This notebook is available at https://github.com/databricks-industry-solutions/cv-quality-inspection. For more information about this solution accelerator, visit https://www.databricks.com/solutions/accelerators/product-quality-inspection.
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC #Using the model for inference in production
 # MAGIC In the previous notebook we have trained our deep learning model and deployed it using the model registry. Here we will see how we can use the model for inference.
-# MAGIC 
+# MAGIC
 # MAGIC In the first step we will need to download the model from MLflow repository
 
 # COMMAND ----------
@@ -120,9 +124,9 @@ spark.table("circuit_board_gold").withColumn(
 
 # MAGIC %md
 # MAGIC ### Deploy it to our rest REST serverless real-time inference endpoints
-# MAGIC 
+# MAGIC
 # MAGIC Let us deploy the model to a REST serverless real-time inference endpoint.
-# MAGIC 
+# MAGIC
 # MAGIC But first let us create a wrapper model to be able to accept base64 images as input and publish it to MLflow
 
 # COMMAND ----------
@@ -220,27 +224,27 @@ client.transition_model_version_stage(
 
 # MAGIC %md
 # MAGIC We can now deploy this new model to our serverless real-time serving endpoint.
-# MAGIC 
+# MAGIC
 # MAGIC Use the example and click "send request".
-# MAGIC 
+# MAGIC
 # MAGIC <img width="1000px" src="https://raw.githubusercontent.com/databricks-industry-solutions/cv-quality-inspection/main/images/serving.png">
 
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC 
+# MAGIC
 # MAGIC # Conclusion
-# MAGIC 
+# MAGIC
 # MAGIC That is it! We have built an end-toend pipeline to incrementally ingest our dataset, clean it, and train a deep learning model. The production-grade pipeline and model is now deployed and ready for use.
-# MAGIC 
+# MAGIC
 # MAGIC Databricks Lakehouse accelerate your team and simplify the go-to production:
-# MAGIC 
+# MAGIC
 # MAGIC * Unique ingestion and data preparation capabilities with autoloader making Data Engineering accessible to all
 # MAGIC * Ability to support all use-cases ingest and process structured and non structured dataset
 # MAGIC * Advanced ML capabilities for ML training
 # MAGIC * MLOps coverage to let your Data Scientist team focus on what matters (improving your business) and not operational task
 # MAGIC * Support for all type of production deployment to cover all your use case, without external tools
 # MAGIC * Security and compliance covered all along, from data security (table ACL) to model governance
-# MAGIC 
-# MAGIC 
+# MAGIC
+# MAGIC
 # MAGIC As a result, teams using Databricks are able to deploy in production advanced ML projects in a matter of weeks, from ingestion to model deployment, drastically accelerating business.

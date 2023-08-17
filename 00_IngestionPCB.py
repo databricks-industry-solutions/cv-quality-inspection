@@ -1,4 +1,8 @@
 # Databricks notebook source
+# MAGIC %md This notebook is available at https://github.com/databricks-industry-solutions/cv-quality-inspection. For more information about this solution accelerator, visit https://www.databricks.com/solutions/accelerators/product-quality-inspection.
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # Product Quality Inspection of Printed Circuit Board (PCB) using Computer Vision and Real-time Serverless Inference
 # MAGIC
